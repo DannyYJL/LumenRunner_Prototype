@@ -3,7 +3,7 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("移动设置")]
-    public float forwardSpeed = 8f;
+    public float forwardSpeed = 3f;
     public float sideSpeed = 15f;
     public float roadWidth = 9f;
 
