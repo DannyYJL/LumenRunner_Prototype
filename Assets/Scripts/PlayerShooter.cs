@@ -7,8 +7,8 @@ public class PlayerShooter : MonoBehaviour
     public Camera mainCamera;
 
     public float shootForce = 50f;
-    
-    public float fireRate = 2f; 
+
+    public float fireRate = 2f;
 
     private float nextFireTime = 0f;
 
@@ -17,7 +17,7 @@ public class PlayerShooter : MonoBehaviour
         if (Input.GetMouseButtonDown(0) && Time.time >= nextFireTime)
         {
             Shoot();
-            
+
             nextFireTime = Time.time + fireRate;
         }
     }
@@ -40,8 +40,8 @@ public class PlayerShooter : MonoBehaviour
         Vector3 direction = targetPoint - firePoint.position;
 
         GameObject currentBullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
-        
-        
-        currentBullet.GetComponent<Rigidbody>().linearVelocity = direction.normalized * shootForce; // Unity 6 用 linearVelocity，旧版用 velocity
+
+
+        currentBullet.GetComponent<Rigidbody>().linearVelocity = direction.normalized * shootForce;
     }
 }
