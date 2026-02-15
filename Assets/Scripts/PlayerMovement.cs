@@ -23,13 +23,17 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate()
     {
         if (isGameStopped) return;
-        Vector3 forwardMove = transform.forward * forwardSpeed * Time.fixedDeltaTime;
-        float horizontalInput = Input.GetAxis("Horizontal");
-        Vector3 sideMove = transform.right * horizontalInput * sideSpeed * Time.fixedDeltaTime;
 
-        Vector3 newPosition = rb.position + forwardMove + sideMove;
-        newPosition.x = Mathf.Clamp(newPosition.x, -roadWidth, roadWidth);
-        rb.MovePosition(newPosition);
+        float horizontalInput = Input.GetAxis("Horizontal");
+        
+        Vector3 v = rb.linearVelocity;
+        v.z = forwardSpeed;
+        v.x = horizontalInput * sideSpeed;
+        rb.linearVelocity = v;
+        
+        Vector3 p = rb.position;
+        p.x = Mathf.Clamp(p.x, -roadWidth, roadWidth);
+        rb.position = p;
     }
 
     private void OnCollisionEnter(Collision collision)
