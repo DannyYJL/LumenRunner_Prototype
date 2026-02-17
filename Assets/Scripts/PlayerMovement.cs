@@ -5,6 +5,7 @@ public class PlayerMovement : MonoBehaviour
     public float forwardSpeed = 5f;
     public float sideSpeed = 15f;
     public float roadWidth = 4.5f;
+    public int score = 0;
 
     public GameObject gameOverUI;
     public GameObject finishedUI;
@@ -43,13 +44,28 @@ public class PlayerMovement : MonoBehaviour
             TriggerEndGame(gameOverUI);
         }
     }
+    
     private void OnTriggerEnter(Collider other)
+{
+    if (isGameStopped) return;
+
+    Debug.Log("Triggered with: " + other.gameObject.name + " | Tag: " + other.tag);
+
+    if (other.CompareTag("Collectible"))
     {
-        if (other.CompareTag("Finish"))
-        {
-            TriggerEndGame(finishedUI);
-        }
+        score += 1;
+        Debug.Log("Score: " + score);
+        Destroy(other.gameObject);
+        return;
     }
+
+    if (other.CompareTag("Finish"))
+    {
+        TriggerEndGame(finishedUI);
+        return;
+    }
+}
+
 
     private void TriggerEndGame(GameObject uiToShow)
     {

@@ -3,6 +3,11 @@ using System.Collections; // 必须引用这个才能使用协程 Coroutine
 
 public class PlayerShooter : MonoBehaviour
 {
+    private float baseFireRate;
+    private float baseReloadTime;
+
+    private Coroutine boostCoroutine;
+
     [Header("基础射击")]
     public GameObject bulletPrefab;
     public Transform firePoint;
@@ -20,6 +25,8 @@ public class PlayerShooter : MonoBehaviour
     void Start()
     {
         currentAmmo = maxAmmo; // 初始化时装满子弹
+        baseFireRate = fireRate;
+        baseReloadTime = reloadTime;
     }
 
     void Update()
@@ -87,4 +94,47 @@ public class PlayerShooter : MonoBehaviour
         isReloading = false;
         Debug.Log("换弹完成！");
     }
+
+    public void RefillAmmo(int amount)
+    {
+        currentAmmo = Mathf.Clamp(currentAmmo + amount, 0, maxAmmo);
+        Debug.Log("弹药补给！当前弹药: " + currentAmmo);
+    }
+
+    public void ApplyBoost(float fireRateMultiplier, float reloadTimeMultiplier, float duration)
+    {
+        // Stop old boost and reset first (so boosts don't stack weirdly)
+        if (boostCoroutine != null)
+        {
+            StopCoroutine(boostCoroutine);
+            ResetBoost();
+        }
+
+        boostCoroutine = StartCoroutine(BoostRoutine(fireRateMultiplier, reloadTimeMultiplier, duration));
+    }
+
+    private IEnumerator BoostRoutine(float fireRateMultiplier, float reloadTimeMultiplier, float duration)
+    {
+        // fireRate faster
+        fireRate = Mathf.Max(0.01f, baseFireRate * fireRateMultiplier);
+
+        // reloadTime faster
+        reloadTime = Mathf.Max(0.05f, baseReloadTime * reloadTimeMultiplier);
+
+        Debug.Log($"Boost starts！fireRate={fireRate}, reloadTime={reloadTime}");
+
+        yield return new WaitForSeconds(duration);
+
+        ResetBoost();
+        boostCoroutine = null;
+
+        Debug.Log("Boost over, back to normal");
+    }
+
+    private void ResetBoost()
+    {
+        fireRate = baseFireRate;
+        reloadTime = baseReloadTime;
+    }
+
 }
