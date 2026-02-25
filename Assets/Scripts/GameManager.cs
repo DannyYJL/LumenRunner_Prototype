@@ -1,10 +1,18 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using System.Collections;
 using TMPro;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject gameOverUI;
+    [Header("UI Elements")]
+    public GameObject gameOverTextUI;  
+    public GameObject restartButtonUI; 
     public GameObject finishedUI;
+
+    [Header("Settings")]
+    public float delayBeforeRestart = 2.0f; 
+
     private bool gameHasEnded = false;
 
     public void EndGame()
@@ -12,11 +20,23 @@ public class GameManager : MonoBehaviour
         if (gameHasEnded == false)
         {
             gameHasEnded = true;
-            gameOverUI.SetActive(true);
-            Time.timeScale = 0f;
+            
+            Time.timeScale = 0f; 
+
+            StartCoroutine(ShowRestartSequence());
         }
     }
 
+    private IEnumerator ShowRestartSequence()
+    {
+        gameOverTextUI.SetActive(true);
+        if (restartButtonUI != null) restartButtonUI.SetActive(false);
+
+        yield return new WaitForSecondsRealtime(delayBeforeRestart);
+
+        gameOverTextUI.SetActive(false);
+        if (restartButtonUI != null) restartButtonUI.SetActive(true);
+    }
 
     public void CompleteLevel()
     {
@@ -26,5 +46,11 @@ public class GameManager : MonoBehaviour
             finishedUI.SetActive(true);
             Time.timeScale = 0f;
         }
+    }
+
+    public void RestartGame()
+    {
+        Time.timeScale = 1f; 
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name); 
     }
 }

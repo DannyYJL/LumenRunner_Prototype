@@ -7,8 +7,7 @@ public class PlayerMovement : MonoBehaviour
     public float roadWidth = 4.5f;
     public int score = 0;
 
-    public GameObject gameOverUI;
-    public GameObject finishedUI;
+    public GameManager gameManager;
 
     private Rigidbody rb;
     private bool isGameStopped = false;
@@ -16,8 +15,6 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        if (gameOverUI != null) gameOverUI.SetActive(false);
-        if (finishedUI != null) finishedUI.SetActive(false);
         Time.timeScale = 1f;
     }
 
@@ -41,45 +38,42 @@ public class PlayerMovement : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Obstacles"))
         {
-            TriggerEndGame(gameOverUI);
+            if (isGameStopped) return;
+            isGameStopped = true;
+            
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+
+            if (gameManager != null)
+            {
+                gameManager.EndGame();
+            }
         }
     }
     
     private void OnTriggerEnter(Collider other)
-{
-    if (isGameStopped) return;
-
-    Debug.Log("Triggered with: " + other.gameObject.name + " | Tag: " + other.tag);
-
-    if (other.CompareTag("Collectible"))
-    {
-        score += 1;
-        Debug.Log("Score: " + score);
-        Destroy(other.gameObject);
-        return;
-    }
-
-    if (other.CompareTag("Finish"))
-    {
-        TriggerEndGame(finishedUI);
-        return;
-    }
-}
-
-
-    private void TriggerEndGame(GameObject uiToShow)
     {
         if (isGameStopped) return;
 
-        isGameStopped = true;
-
-        if (uiToShow != null)
+        if (other.CompareTag("Collectible"))
         {
-            uiToShow.SetActive(true);
+            score += 1;
+            Destroy(other.gameObject);
+            return;
         }
 
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-        Time.timeScale = 0f;
+        if (other.CompareTag("Finish"))
+        {
+            isGameStopped = true;
+            
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+
+            if (gameManager != null)
+            {
+                gameManager.CompleteLevel();
+            }
+            return;
+        }
     }
 }
