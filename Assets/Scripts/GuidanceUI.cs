@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using TMPro;
-using UnityEngine.InputSystem; // 必须保留
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(TextMeshProUGUI))]
 public class GuidanceUI : MonoBehaviour
@@ -17,8 +17,10 @@ public class GuidanceUI : MonoBehaviour
 
     void Update()
     {
-        // 使用新输入系统的检测方式：检测键盘是否有任何键按下
-        if (!hasStartedFading && Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame)
+        bool keyPressed = Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame;
+        bool mouseClicked = Mouse.current != null && (Mouse.current.leftButton.wasPressedThisFrame || Mouse.current.rightButton.wasPressedThisFrame || Mouse.current.middleButton.wasPressedThisFrame);
+
+        if (!hasStartedFading && (keyPressed || mouseClicked))
         {
             hasStartedFading = true;
             StartCoroutine(FadeOutRoutine());
