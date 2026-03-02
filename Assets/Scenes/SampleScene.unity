@@ -2047,13 +2047,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8fd0270b37f74d478046138d6ad1cc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  minSpeed: 0
-  maxSpeed: 20
-  acceleration: 15
+  forwardSpeed: 5
   sideSpeed: 15
   roadWidth: 9
   score: 0
-  gameManager: {fileID: 1677936942}
+  gameOverUI: {fileID: 0}
+  finishedUI: {fileID: 0}
 --- !u!54 &633982878
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2198,8 +2197,6 @@ MonoBehaviour:
   fireRate: 2
   maxAmmo: 5
   reloadTime: 2.5
-  ammoText: {fileID: 0}
-  reloadingPrompt: {fileID: 1635320507}
 --- !u!1 &644659975
 GameObject:
   m_ObjectHideFlags: 0
@@ -3118,7 +3115,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d86d3c6a2d3fe4e9ba4f1286082ce0c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GuidanceUI
-  fadeDuration: 0.3
 --- !u!1 &1054545703
 GameObject:
   m_ObjectHideFlags: 0
@@ -4147,8 +4143,8 @@ Transform:
   m_GameObject: {fileID: 1469877796}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.08, y: 0, z: -40.33}
-  m_LocalScale: {x: 7, y: 0.1, z: 10}
+  m_LocalPosition: {x: 0.08, y: 0, z: -40.4}
+  m_LocalScale: {x: 7, y: 0.1, z: 10.8}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1199783940}
@@ -4244,7 +4240,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MovingPlatform
   amplitude: 5
-  speed: 1
+  speed: 1.25
   moveAxis: {x: 1, y: 0, z: 0}
 --- !u!54 &1469877802
 Rigidbody:
@@ -4501,10 +4497,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fcceb06ad8eb844729076c0ae1785c7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  gameOverTextUI: {fileID: 598273531}
-  restartButtonUI: {fileID: 644659975}
+  gameOverUI: {fileID: 0}
   finishedUI: {fileID: 1381868579}
-  delayBeforeRestart: 1
 --- !u!4 &1677936943
 Transform:
   m_ObjectHideFlags: 0
