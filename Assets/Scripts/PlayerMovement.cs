@@ -65,10 +65,17 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Obstacles"))
+        if (collision.gameObject.CompareTag("Moving Obstacle") || collision.gameObject.CompareTag("Fall") || collision.gameObject.CompareTag("Obstacles"))
         {
             if (isGameStopped) return;
             StopMovement();
+
+            if (collision.gameObject.CompareTag("Moving Obstacle"))
+                AnalyticsLogger.Instance?.LogDeath(DeathCause.MovingObstacle);
+            if (collision.gameObject.CompareTag("Fall"))
+                AnalyticsLogger.Instance?.LogDeath(DeathCause.Fissure);
+            if (collision.gameObject.CompareTag("Obstacles"))
+                AnalyticsLogger.Instance?.LogDeath(DeathCause.Other);
 
             if (gameManager != null)
             {

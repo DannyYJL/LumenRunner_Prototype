@@ -694,7 +694,7 @@ GameObject:
   - component: {fileID: 252227032}
   m_Layer: 0
   m_Name: Cube (1)
-  m_TagString: Obstacles
+  m_TagString: Moving Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -821,7 +821,7 @@ GameObject:
   - component: {fileID: 255105974}
   m_Layer: 0
   m_Name: KillZone
-  m_TagString: Obstacles
+  m_TagString: Fall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
