@@ -49,37 +49,22 @@ public class AnalyticsUploader : MonoBehaviour
     public void LogDeath(DeathCause cause)
     {
         string timestamp = DateTime.UtcNow.ToString("o");
-
-        var payload = new DeathEvent
-        {
-            token = token,
-            run_id = runId,
-            timestamp = timestamp,
-            death_reason = cause.ToString()
-        };
-
-        StartCoroutine(PostEvent(payload));
-
-        Debug.Log($"[Analytics] Logged death: {cause} (Run {runId})");
+        StartCoroutine(PostDeath(runId, timestamp, cause.ToString()));
     }
 
-    IEnumerator PostEvent(DeathEvent ev)
+    IEnumerator PostDeath(int runId, string timestamp, string reason)
     {
-        string json = JsonUtility.ToJson(ev);
+        WWWForm form = new WWWForm();
+        form.AddField("token", token);
+        form.AddField("run_id", runId);
+        form.AddField("timestamp", timestamp);
+        form.AddField("death_reason", reason);
 
-        using var req = new UnityWebRequest(endpoint, "POST");
-        req.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(json));
-        req.downloadHandler = new DownloadHandlerBuffer();
-        req.SetRequestHeader("Content-Type", "application/json");
-
+        using var req = UnityWebRequest.Post(endpoint, form);
         yield return req.SendWebRequest();
 
-        Debug.Log($"Analytics Upload Result: {req.result}, Response: {req.downloadHandler.text}");
-
-        if (req.result != UnityWebRequest.Result.Success)
-        {
-            Debug.LogWarning("Upload failed: " + req.error);
-        }
+        Debug.Log($"[Analytics] code={req.responseCode} result={req.result} err={req.error}");
+        Debug.Log($"[Analytics] resp={req.downloadHandler.text}");
     }
 
     [Serializable]
