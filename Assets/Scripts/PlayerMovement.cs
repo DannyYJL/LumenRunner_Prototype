@@ -23,7 +23,7 @@ public class PlayerMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         Time.timeScale = 1f;
-        
+
         // Start the game at the minimum speed
         currentForwardSpeed = minSpeed;
     }
@@ -52,12 +52,12 @@ public class PlayerMovement : MonoBehaviour
         if (isGameStopped) return;
 
         float horizontalInput = Input.GetAxis("Horizontal");
-        
+
         Vector3 v = rb.linearVelocity;
         v.z = currentForwardSpeed; // Use the dynamic speed controlled by W/S
         v.x = horizontalInput * sideSpeed;
         rb.linearVelocity = v;
-        
+
         Vector3 p = rb.position;
         p.x = Mathf.Clamp(p.x, -roadWidth, roadWidth);
         rb.position = p;
@@ -76,7 +76,7 @@ public class PlayerMovement : MonoBehaviour
             }
         }
     }
-    
+
     private void OnTriggerEnter(Collider other)
     {
         if (isGameStopped) return;
@@ -107,4 +107,5 @@ public class PlayerMovement : MonoBehaviour
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
     }
+
 }
