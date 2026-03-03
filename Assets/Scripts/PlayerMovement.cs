@@ -71,11 +71,11 @@ public class PlayerMovement : MonoBehaviour
             StopMovement();
 
             if (collision.gameObject.CompareTag("Moving Obstacle"))
-                AnalyticsLogger.Instance?.LogDeath(DeathCause.MovingObstacle);
+                FindObjectOfType<AnalyticsUploader>()?.LogDeath(DeathCause.MovingObstacle);
             if (collision.gameObject.CompareTag("Fall"))
-                AnalyticsLogger.Instance?.LogDeath(DeathCause.Fissure);
+                FindObjectOfType<AnalyticsUploader>()?.LogDeath(DeathCause.Fissure);
             if (collision.gameObject.CompareTag("Obstacles"))
-                AnalyticsLogger.Instance?.LogDeath(DeathCause.Other);
+                FindObjectOfType<AnalyticsUploader>()?.LogDeath(DeathCause.Other);
 
             if (gameManager != null)
             {

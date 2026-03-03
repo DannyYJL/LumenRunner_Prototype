@@ -52,7 +52,7 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 1f; 
 
-        AnalyticsLogger.Instance?.StartNewRun();
+        AnalyticsUploader.Instance?.StartNewRun();
 
         SceneManager.LoadScene(SceneManager.GetActiveScene().name); 
     }

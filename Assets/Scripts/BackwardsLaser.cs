@@ -88,7 +88,7 @@ public class BackwardsLaser : MonoBehaviour
         
         Debug.Log("Player hit by laser. Triggering Game Over!");
         
-        AnalyticsLogger.Instance?.LogDeath(DeathCause.Laser);
+        FindObjectOfType<AnalyticsUploader>()?.LogDeath(DeathCause.Laser);
 
         if (gameManager != null)
         {
