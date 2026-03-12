@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections;
-using TMPro; // Required for TextMeshPro UI
+using TMPro;
 
 public class PlayerShooter : MonoBehaviour
 {
@@ -23,17 +23,13 @@ public class PlayerShooter : MonoBehaviour
     private bool isReloading = false;
 
     [Header("UI References")]
-    public TextMeshProUGUI ammoText;      // Drag your Ammo Text here
-    public GameObject reloadingPrompt;  // Drag your "Reloading" UI object here
+    public TextMeshProUGUI ammoText;
 
     void Start()
     {
         currentAmmo = maxAmmo;
         baseFireRate = fireRate;
-        baseReloadTime = reloadTime;
-
-        // Initialize UI
-        if (reloadingPrompt != null) reloadingPrompt.SetActive(false);
+        baseReloadTime = Mathf.Max(0.1f, reloadTime);
         UpdateAmmoUI();
     }
 
@@ -41,15 +37,7 @@ public class PlayerShooter : MonoBehaviour
     {
         if (isReloading) return;
 
-        // Auto reload when empty
-        if (currentAmmo <= 0)
-        {
-            StartCoroutine(Reload());
-            return;
-        }
-
-        // Manual reload
-        if (Input.GetKeyDown(KeyCode.R) && currentAmmo < maxAmmo)
+        if (currentAmmo <= 0 || (Input.GetKeyDown(KeyCode.R) && currentAmmo < maxAmmo))
         {
             StartCoroutine(Reload());
             return;
@@ -66,20 +54,9 @@ public class PlayerShooter : MonoBehaviour
     {
         currentAmmo--;
         UpdateAmmoUI();
-
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
-        Vector3 targetPoint;
-
-        if (Physics.Raycast(ray, out hit))
-        {
-            targetPoint = hit.point;
-        }
-        else
-        {
-            targetPoint = ray.GetPoint(100);
-        }
-
+        Vector3 targetPoint = Physics.Raycast(ray, out hit) ? hit.point : ray.GetPoint(100);
         Vector3 direction = targetPoint - firePoint.position;
         GameObject currentBullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
         currentBullet.GetComponent<Rigidbody>().linearVelocity = direction.normalized * shootForce;
@@ -88,15 +65,11 @@ public class PlayerShooter : MonoBehaviour
     IEnumerator Reload()
     {
         isReloading = true;
+        UpdateAmmoUI();
 
-        if (reloadingPrompt != null) reloadingPrompt.SetActive(true);
-
-        yield return new WaitForSeconds(reloadTime);
+        yield return new WaitForSecondsRealtime(reloadTime);
 
         currentAmmo = maxAmmo;
-        
-        if (reloadingPrompt != null) reloadingPrompt.SetActive(false);
-        
         isReloading = false;
         UpdateAmmoUI();
     }
@@ -111,7 +84,7 @@ public class PlayerShooter : MonoBehaviour
     {
         if (ammoText != null)
         {
-            ammoText.text = currentAmmo + " / " + maxAmmo;
+            ammoText.text = isReloading ? "RELOADING..." : currentAmmo + " / " + maxAmmo;
         }
     }
 
@@ -122,17 +95,14 @@ public class PlayerShooter : MonoBehaviour
             StopCoroutine(boostCoroutine);
             ResetBoost();
         }
-
         boostCoroutine = StartCoroutine(BoostRoutine(fireRateMultiplier, reloadTimeMultiplier, duration));
     }
 
     private IEnumerator BoostRoutine(float fireRateMultiplier, float reloadTimeMultiplier, float duration)
     {
         fireRate = Mathf.Max(0.01f, baseFireRate * fireRateMultiplier);
-        reloadTime = Mathf.Max(0.05f, baseReloadTime * reloadTimeMultiplier);
-
-        yield return new WaitForSeconds(duration);
-
+        reloadTime = Mathf.Max(0.1f, baseReloadTime * reloadTimeMultiplier);
+        yield return new WaitForSecondsRealtime(duration);
         ResetBoost();
         boostCoroutine = null;
     }
