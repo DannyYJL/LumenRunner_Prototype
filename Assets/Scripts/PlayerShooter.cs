@@ -7,6 +7,9 @@ public class PlayerShooter : MonoBehaviour
     private float baseFireRate;
     private float baseReloadTime;
     private Coroutine boostCoroutine;
+    private Coroutine subtitleCoroutine;
+    private TextMeshProUGUI subtitleText;
+    private bool hasEnhancedShot;
 
     [Header("Shooting Settings")]
     public GameObject bulletPrefab;
@@ -24,6 +27,10 @@ public class PlayerShooter : MonoBehaviour
 
     [Header("UI References")]
     public TextMeshProUGUI ammoText;
+
+    [Header("Pickup Subtitle")]
+    public string enhancedAmmoSubtitle = "AMMO ENHANCED";
+    public float subtitleDuration = 1.5f;
 
     void Start()
     {
@@ -52,6 +59,9 @@ public class PlayerShooter : MonoBehaviour
 
     void Shoot()
     {
+        bool useEnhancedShot = hasEnhancedShot;
+        hasEnhancedShot = false;
+
         currentAmmo--;
         UpdateAmmoUI();
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
@@ -59,6 +69,11 @@ public class PlayerShooter : MonoBehaviour
         Vector3 targetPoint = Physics.Raycast(ray, out hit) ? hit.point : ray.GetPoint(100);
         Vector3 direction = targetPoint - firePoint.position;
         GameObject currentBullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
+        LightBullet lightBullet = currentBullet.GetComponent<LightBullet>();
+        if (lightBullet != null)
+        {
+            lightBullet.SetBlockBreaking(useEnhancedShot);
+        }
         currentBullet.GetComponent<Rigidbody>().linearVelocity = direction.normalized * shootForce;
     }
 
@@ -111,5 +126,82 @@ public class PlayerShooter : MonoBehaviour
     {
         fireRate = baseFireRate;
         reloadTime = baseReloadTime;
+    }
+
+    public void EnableNextShotBlockBreak(string subtitleOverride = null)
+    {
+        hasEnhancedShot = true;
+        ShowSubtitle(string.IsNullOrWhiteSpace(subtitleOverride) ? enhancedAmmoSubtitle : subtitleOverride);
+    }
+
+    private void ShowSubtitle(string message)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            return;
+        }
+
+        EnsureSubtitleText();
+        if (subtitleText == null)
+        {
+            return;
+        }
+
+        subtitleText.text = message;
+
+        if (subtitleCoroutine != null)
+        {
+            StopCoroutine(subtitleCoroutine);
+        }
+
+        subtitleCoroutine = StartCoroutine(SubtitleRoutine());
+    }
+
+    private void EnsureSubtitleText()
+    {
+        if (subtitleText != null || ammoText == null)
+        {
+            return;
+        }
+
+        subtitleText = Instantiate(ammoText, ammoText.transform.parent);
+        subtitleText.name = "RuntimeSubtitleText";
+        subtitleText.alignment = TextAlignmentOptions.Center;
+        subtitleText.fontSize = Mathf.Max(24f, ammoText.fontSize * 0.7f);
+        subtitleText.raycastTarget = false;
+        subtitleText.text = string.Empty;
+
+        RectTransform ammoRect = ammoText.rectTransform;
+        RectTransform subtitleRect = subtitleText.rectTransform;
+        subtitleRect.anchorMin = ammoRect.anchorMin;
+        subtitleRect.anchorMax = ammoRect.anchorMax;
+        subtitleRect.pivot = ammoRect.pivot;
+        subtitleRect.sizeDelta = new Vector2(Mathf.Max(ammoRect.sizeDelta.x, 360f), ammoRect.sizeDelta.y);
+        subtitleRect.anchoredPosition = ammoRect.anchoredPosition + new Vector2(0f, 40f);
+
+        Color subtitleColor = subtitleText.color;
+        subtitleText.color = new Color(subtitleColor.r, subtitleColor.g, subtitleColor.b, 0f);
+    }
+
+    private IEnumerator SubtitleRoutine()
+    {
+        Color baseColor = subtitleText.color;
+        subtitleText.color = new Color(baseColor.r, baseColor.g, baseColor.b, 1f);
+
+        yield return new WaitForSecondsRealtime(subtitleDuration);
+
+        float fadeTime = 0.25f;
+        float elapsed = 0f;
+
+        while (elapsed < fadeTime)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float alpha = Mathf.Lerp(1f, 0f, elapsed / fadeTime);
+            subtitleText.color = new Color(baseColor.r, baseColor.g, baseColor.b, alpha);
+            yield return null;
+        }
+
+        subtitleText.color = new Color(baseColor.r, baseColor.g, baseColor.b, 0f);
+        subtitleCoroutine = null;
     }
 }
