@@ -3,14 +3,17 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Speed Settings")]
-    public float minSpeed = 5f;          // Minimum speed (cannot be 0)
-    public float maxSpeed = 30f;         // Maximum speed
-    public float acceleration = 15f;     // How fast it speeds up/slows down
-    private float currentForwardSpeed;   // Current dynamic speed
+    public float minSpeed = 5f;
+    public float maxSpeed = 30f;
+    public float acceleration = 15f;
+    private float currentForwardSpeed;
 
     [Header("Lateral Movement")]
     public float sideSpeed = 15f;
     public float roadWidth = 4.5f;
+
+    [Header("Jump Pad Settings")]
+    public float jumpPadUpwardSpeed = 15f;   // 向上弹射速度
 
     [Header("Game State")]
     public int score = 0;
@@ -23,8 +26,6 @@ public class PlayerMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         Time.timeScale = 1f;
-
-        // Start the game at the minimum speed
         currentForwardSpeed = minSpeed;
     }
 
@@ -32,18 +33,15 @@ public class PlayerMovement : MonoBehaviour
     {
         if (isGameStopped) return;
 
-        // Accelerate with W
         if (Input.GetKey(KeyCode.W))
         {
             currentForwardSpeed += acceleration * Time.deltaTime;
         }
-        // Decelerate with S
         else if (Input.GetKey(KeyCode.S))
         {
             currentForwardSpeed -= acceleration * Time.deltaTime;
         }
 
-        // Clamp speed so it stays between minSpeed and maxSpeed
         currentForwardSpeed = Mathf.Clamp(currentForwardSpeed, minSpeed, maxSpeed);
     }
 
@@ -54,7 +52,7 @@ public class PlayerMovement : MonoBehaviour
         float horizontalInput = Input.GetAxis("Horizontal");
 
         Vector3 v = rb.linearVelocity;
-        v.z = currentForwardSpeed; // Use the dynamic speed controlled by W/S
+        v.z = currentForwardSpeed;
         v.x = horizontalInput * sideSpeed;
         rb.linearVelocity = v;
 
@@ -65,9 +63,19 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Moving Obstacle") || collision.gameObject.CompareTag("Fall") || collision.gameObject.CompareTag("Obstacles"))
+        if (isGameStopped) return;
+
+        // 先处理 jump pad
+        if (collision.gameObject.CompareTag("JumpPad"))
         {
-            if (isGameStopped) return;
+            LaunchUpward();
+            return;
+        }
+
+        if (collision.gameObject.CompareTag("Moving Obstacle") || 
+            collision.gameObject.CompareTag("Fall") || 
+            collision.gameObject.CompareTag("Obstacles"))
+        {
             StopMovement();
 
             if (collision.gameObject.CompareTag("Moving Obstacle"))
@@ -107,12 +115,20 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // Helper method to stop the player physics
+    private void LaunchUpward()
+    {
+        Vector3 v = rb.linearVelocity;
+
+        // 保持当前 x 和 z，只重设 y 为向上速度
+        v.y = jumpPadUpwardSpeed;
+
+        rb.linearVelocity = v;
+    }
+
     private void StopMovement()
     {
         isGameStopped = true;
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
     }
-
 }
