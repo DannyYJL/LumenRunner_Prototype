@@ -8,6 +8,7 @@ TagManager:
   - Collectible
   - Fall
   - Moving Obstacle
+  - JumpPad
   layers:
   - Default
   - TransparentFX
@@ -15,8 +16,8 @@ TagManager:
   - Player
   - Water
   - UI
-  - 
-  - 
+  - Chaser
+  - Obstacle
   - 
   - 
   - 
