@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class AmmoBoostCollectible : MonoBehaviour
 {
+    public int scoreValue = 50;
+
     [Header("Ammo Refill")]
     public int refillAmount = 2;
 
@@ -26,6 +28,17 @@ public class AmmoBoostCollectible : MonoBehaviour
         if (!other.CompareTag("Player")) return;
 
         PlayerShooter shooter = other.GetComponent<PlayerShooter>();
+        if (shooter == null)
+        {
+            shooter = other.GetComponentInParent<PlayerShooter>();
+        }
+
+        PlayerMovement playerMovement = other.GetComponent<PlayerMovement>();
+        if (playerMovement == null)
+        {
+            playerMovement = other.GetComponentInParent<PlayerMovement>();
+        }
+
         if (shooter != null)
         {
             // instant refill
@@ -35,6 +48,11 @@ public class AmmoBoostCollectible : MonoBehaviour
             // temporary boost
             if (duration > 0f)
                 shooter.ApplyBoost(fireRateMultiplier, reloadTimeMultiplier, duration);
+        }
+
+        if (playerMovement != null)
+        {
+            playerMovement.AddScore(scoreValue);
         }
 
         Destroy(gameObject);

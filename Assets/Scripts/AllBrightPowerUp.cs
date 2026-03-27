@@ -1,61 +1,50 @@
 using UnityEngine;
-using System.Collections;
-using UnityEngine.Rendering;
-using UnityEngine.Rendering.Universal;
 
 public class AllBrightPowerUp : MonoBehaviour
 {
-    public float rotateSpeed = 100f;
-    public float duration = 5f;
-    public float brightExposure = 3.0f;
+    public float rotateSpeed = 90f;
+    public float duration = 3f;
+    public float exposureBoost = 0.45f;
+    public float ambientIntensityMultiplier = 1.2f;
+    public float lightIntensityMultiplier = 1.15f;
+    public Color flashLightTint = new Color(1f, 0.96f, 0.84f);
+    public int scoreValue = 100;
 
-    private Volume globalVolume;
-    private ColorAdjustments colorAdjustments;
-    private float normalExposure;
-    private bool isActivated = false;
-
-    void Start()
-    {
-        globalVolume = GameObject.FindObjectOfType<Volume>();
-        if (globalVolume != null && globalVolume.profile.TryGet(out colorAdjustments))
-        {
-            normalExposure = colorAdjustments.postExposure.value;
-        }
-    }
+    private bool isActivated;
 
     void Update()
     {
-        transform.Rotate(Vector3.up * rotateSpeed * Time.deltaTime);
+        if (!isActivated)
+        {
+            transform.Rotate(Vector3.up * rotateSpeed * Time.deltaTime, Space.World);
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") && !isActivated)
+        if (isActivated || !other.CompareTag("Player"))
         {
-            isActivated = true;
-            StartCoroutine(FlashEnvironment());
-        }
-    }
-
-    IEnumerator FlashEnvironment()
-    {
-        foreach (MeshRenderer mr in GetComponentsInChildren<MeshRenderer>()) mr.enabled = false;
-        if (GetComponent<Collider>() != null) GetComponent<Collider>().enabled = false;
-
-        if (colorAdjustments != null)
-        {
-            colorAdjustments.postExposure.value = brightExposure;
-            Camera.main.backgroundColor = Color.white;
+            return;
         }
 
-        yield return new WaitForSeconds(duration);
-
-        if (colorAdjustments != null)
+        PlayerMovement playerMovement = other.GetComponent<PlayerMovement>();
+        if (playerMovement == null)
         {
-            colorAdjustments.postExposure.value = normalExposure;
-            Camera.main.backgroundColor = Color.black;
+            playerMovement = other.GetComponentInParent<PlayerMovement>();
         }
 
+        if (playerMovement != null)
+        {
+            playerMovement.AddScore(scoreValue);
+        }
+
+        isActivated = true;
+        MapFlashCollectible.TriggerFlash(
+            duration,
+            exposureBoost,
+            ambientIntensityMultiplier,
+            lightIntensityMultiplier,
+            flashLightTint);
         Destroy(gameObject);
     }
 }

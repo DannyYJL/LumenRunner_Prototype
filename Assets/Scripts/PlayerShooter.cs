@@ -9,7 +9,10 @@ public class PlayerShooter : MonoBehaviour
     private Coroutine boostCoroutine;
     private Coroutine subtitleCoroutine;
     private TextMeshProUGUI subtitleText;
+    private TextMeshProUGUI scoreText;
+    private TextMeshProUGUI timerText;
     private bool hasEnhancedShot;
+    private PlayerMovement playerMovement;
 
     [Header("Shooting Settings")]
     public GameObject bulletPrefab;
@@ -37,11 +40,16 @@ public class PlayerShooter : MonoBehaviour
         currentAmmo = maxAmmo;
         baseFireRate = fireRate;
         baseReloadTime = Mathf.Max(0.1f, reloadTime);
+        playerMovement = GetComponent<PlayerMovement>();
         UpdateAmmoUI();
+        EnsureScoreboardTexts();
+        UpdateScoreboardUI();
     }
 
     void Update()
     {
+        UpdateScoreboardUI();
+
         if (isReloading) return;
 
         if (currentAmmo <= 0 || (Input.GetKeyDown(KeyCode.R) && currentAmmo < maxAmmo))
@@ -73,6 +81,7 @@ public class PlayerShooter : MonoBehaviour
         if (lightBullet != null)
         {
             lightBullet.SetBlockBreaking(useEnhancedShot);
+            lightBullet.SetScoreOwner(playerMovement);
         }
         currentBullet.GetComponent<Rigidbody>().linearVelocity = direction.normalized * shootForce;
     }
@@ -203,5 +212,46 @@ public class PlayerShooter : MonoBehaviour
 
         subtitleText.color = new Color(baseColor.r, baseColor.g, baseColor.b, 0f);
         subtitleCoroutine = null;
+    }
+
+    private void EnsureScoreboardTexts()
+    {
+        if (ammoText == null || scoreText != null || timerText != null)
+        {
+            return;
+        }
+
+        scoreText = Instantiate(ammoText, ammoText.transform.parent);
+        scoreText.name = "RuntimeScoreText";
+        scoreText.alignment = TextAlignmentOptions.Left;
+        scoreText.raycastTarget = false;
+
+        timerText = Instantiate(ammoText, ammoText.transform.parent);
+        timerText.name = "RuntimeTimerText";
+        timerText.alignment = TextAlignmentOptions.Left;
+        timerText.raycastTarget = false;
+
+        ConfigureHudText(scoreText.rectTransform, new Vector2(20f, -20f));
+        ConfigureHudText(timerText.rectTransform, new Vector2(20f, -52f));
+    }
+
+    private void ConfigureHudText(RectTransform textRect, Vector2 anchoredPosition)
+    {
+        textRect.anchorMin = new Vector2(0f, 1f);
+        textRect.anchorMax = new Vector2(0f, 1f);
+        textRect.pivot = new Vector2(0f, 1f);
+        textRect.anchoredPosition = anchoredPosition;
+        textRect.sizeDelta = new Vector2(320f, textRect.sizeDelta.y);
+    }
+
+    private void UpdateScoreboardUI()
+    {
+        if (playerMovement == null || scoreText == null || timerText == null)
+        {
+            return;
+        }
+
+        scoreText.text = "SCORE: " + playerMovement.Score;
+        timerText.text = "TIME: " + playerMovement.GetFormattedElapsedTime();
     }
 }

@@ -3,9 +3,12 @@ using UnityEngine;
 public class LightBullet : MonoBehaviour
 {
     public float lifeTime = 5f;
-    public string breakableTag = "Obstacles";
+    public string obstacleTag = "Obstacles";
+    public string movingObstacleTag = "Moving Obstacle";
+    public int obstacleBreakScore = 50;
 
     private bool canBreakObstacle;
+    private PlayerMovement scoreOwner;
 
     void Start()
     {
@@ -15,6 +18,11 @@ public class LightBullet : MonoBehaviour
     public void SetBlockBreaking(bool enabled)
     {
         canBreakObstacle = enabled;
+    }
+
+    public void SetScoreOwner(PlayerMovement owner)
+    {
+        scoreOwner = owner;
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -41,28 +49,49 @@ public class LightBullet : MonoBehaviour
         }
 
         canBreakObstacle = false;
+        if (scoreOwner != null)
+        {
+            scoreOwner.AddScore(obstacleBreakScore);
+        }
         Destroy(breakTarget);
         Destroy(gameObject);
     }
 
     private GameObject ResolveBreakTarget(Collider hitCollider)
     {
-        if (hitCollider.CompareTag(breakableTag))
+        if (HasBreakableTag(hitCollider.gameObject))
         {
             return hitCollider.gameObject;
         }
 
-        if (hitCollider.attachedRigidbody != null && hitCollider.attachedRigidbody.CompareTag(breakableTag))
+        if (hitCollider.attachedRigidbody != null && HasBreakableTag(hitCollider.attachedRigidbody.gameObject))
         {
             return hitCollider.attachedRigidbody.gameObject;
         }
 
-        Transform root = hitCollider.transform.root;
-        if (root != null && root.CompareTag(breakableTag))
+        Transform current = hitCollider.transform.parent;
+        while (current != null)
         {
-            return root.gameObject;
+            if (HasBreakableTag(current.gameObject) && IsBreakableObject(current))
+            {
+                return current.gameObject;
+            }
+
+            current = current.parent;
         }
 
         return null;
+    }
+
+    private bool HasBreakableTag(GameObject target)
+    {
+        return target.CompareTag(obstacleTag) || target.CompareTag(movingObstacleTag);
+    }
+
+    private bool IsBreakableObject(Transform target)
+    {
+        return target.GetComponent<Collider>() != null
+            || target.GetComponent<Rigidbody>() != null
+            || target.GetComponent<Renderer>() != null;
     }
 }

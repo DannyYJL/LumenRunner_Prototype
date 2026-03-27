@@ -13,7 +13,7 @@ public class PlayerMovement : MonoBehaviour
     public float roadWidth = 4.5f;
 
     [Header("Jump Pad Settings")]
-    public float jumpPadUpwardSpeed = 15f;   // 向上弹射速度
+    public float jumpPadUpwardSpeed = 15f;
 
     [Header("Game State")]
     public int score = 0;
@@ -21,17 +21,24 @@ public class PlayerMovement : MonoBehaviour
 
     private Rigidbody rb;
     private bool isGameStopped = false;
+    private float elapsedTime = 0f;
+
+    public int Score => score;
+    public float ElapsedTime => elapsedTime;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         Time.timeScale = 1f;
         currentForwardSpeed = minSpeed;
+        elapsedTime = 0f;
     }
 
     void Update()
     {
         if (isGameStopped) return;
+
+        elapsedTime += Time.deltaTime;
 
         if (Input.GetKey(KeyCode.W))
         {
@@ -65,15 +72,14 @@ public class PlayerMovement : MonoBehaviour
     {
         if (isGameStopped) return;
 
-        // 先处理 jump pad
         if (collision.gameObject.CompareTag("JumpPad"))
         {
             LaunchUpward();
             return;
         }
 
-        if (collision.gameObject.CompareTag("Moving Obstacle") || 
-            collision.gameObject.CompareTag("Fall") || 
+        if (collision.gameObject.CompareTag("Moving Obstacle") ||
+            collision.gameObject.CompareTag("Fall") ||
             collision.gameObject.CompareTag("Obstacles"))
         {
             StopMovement();
@@ -96,13 +102,6 @@ public class PlayerMovement : MonoBehaviour
     {
         if (isGameStopped) return;
 
-        if (other.CompareTag("Collectible"))
-        {
-            score += 1;
-            Destroy(other.gameObject);
-            return;
-        }
-
         if (other.CompareTag("Finish"))
         {
             StopMovement();
@@ -111,17 +110,25 @@ public class PlayerMovement : MonoBehaviour
             {
                 gameManager.CompleteLevel();
             }
-            return;
         }
+    }
+
+    public void AddScore(int points)
+    {
+        score += Mathf.Max(0, points);
+    }
+
+    public string GetFormattedElapsedTime()
+    {
+        int minutes = Mathf.FloorToInt(elapsedTime / 60f);
+        float seconds = elapsedTime % 60f;
+        return minutes.ToString("00") + ":" + seconds.ToString("00.0");
     }
 
     private void LaunchUpward()
     {
         Vector3 v = rb.linearVelocity;
-
-        // 保持当前 x 和 z，只重设 y 为向上速度
         v.y = jumpPadUpwardSpeed;
-
         rb.linearVelocity = v;
     }
 
