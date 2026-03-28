@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 8476688100495441340}
   - component: {fileID: 22778990439179145}
   - component: {fileID: 7908348583473216379}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: LightBullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -250,3 +250,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightBullet
   lifeTime: 5
+  obstacleTag: Obstacles
+  movingObstacleTag: Moving Obstacle
+  obstacleBreakScore: 50
