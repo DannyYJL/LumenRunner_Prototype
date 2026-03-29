@@ -12,6 +12,8 @@ public class GameManager : MonoBehaviour
 
     [Header("Settings")]
     public float delayBeforeRestart = 2.0f;
+    public string levelSelectionSceneName = "MainMenu";
+    public float delayBeforeReturnToLevelSelection = 2.0f;
     private bool gameHasEnded = false;
     private bool canRestart = false;
     private TextMeshProUGUI runSummaryText;
@@ -85,6 +87,7 @@ public class GameManager : MonoBehaviour
         if (!gameHasEnded)
         {
             gameHasEnded = true;
+            canRestart = false;
             if (finishedUI != null)
             {
                 finishedUI.SetActive(true);
@@ -94,6 +97,7 @@ public class GameManager : MonoBehaviour
             Time.timeScale = 0f;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+            StartCoroutine(ReturnToLevelSelection());
         }
     }
 
@@ -172,5 +176,13 @@ public class GameManager : MonoBehaviour
         {
             runSummaryText.gameObject.SetActive(isVisible);
         }
+    }
+
+    private IEnumerator ReturnToLevelSelection()
+    {
+        yield return new WaitForSecondsRealtime(delayBeforeReturnToLevelSelection);
+
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(levelSelectionSceneName);
     }
 }
