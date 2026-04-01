@@ -12,12 +12,14 @@ public class BackwardsLaser : MonoBehaviour
     public float activeTime = 2.0f;
     public float inactiveTime = 7.0f;
     public float startDelay = 0f;
+    public float extendDuration = 0.4f;
     
     [Header("Direction Settings")]
     public bool shootBackwards = true;
 
     private LineRenderer lineRenderer;
     private bool isLaserActive = false;
+    private float activationStartTime;
     
     private GameManager gameManager;
 
@@ -50,6 +52,7 @@ public class BackwardsLaser : MonoBehaviour
         while (true)
         {
             isLaserActive = true;
+            activationStartTime = Time.time;
             lineRenderer.enabled = true;
             yield return new WaitForSeconds(activeTime);
 
@@ -62,22 +65,29 @@ public class BackwardsLaser : MonoBehaviour
     void FireLaser()
     {
         Vector3 direction = shootBackwards ? -transform.forward : transform.forward;
-        lineRenderer.SetPosition(0, transform.position);
+        Vector3 startPoint = transform.position;
+        lineRenderer.SetPosition(0, startPoint);
 
         RaycastHit hit;
+        Vector3 fullEndPoint = startPoint + (direction * laserRange);
+        bool hitPlayer = false;
 
-        if (Physics.Raycast(transform.position, direction, out hit, laserRange, hitLayers))
+        if (Physics.Raycast(startPoint, direction, out hit, laserRange, hitLayers))
         {
-            lineRenderer.SetPosition(1, hit.point);
-
-            if (hit.collider.CompareTag(playerTag))
-            {
-                KillPlayer();
-            }
+            fullEndPoint = hit.point;
+            hitPlayer = hit.collider.CompareTag(playerTag);
         }
-        else
+
+        float extendProgress = extendDuration <= 0f
+            ? 1f
+            : Mathf.Clamp01((Time.time - activationStartTime) / extendDuration);
+
+        Vector3 currentEndPoint = Vector3.Lerp(startPoint, fullEndPoint, extendProgress);
+        lineRenderer.SetPosition(1, currentEndPoint);
+
+        if (hitPlayer && Vector3.Distance(startPoint, currentEndPoint) >= Vector3.Distance(startPoint, hit.point))
         {
-            lineRenderer.SetPosition(1, transform.position + (direction * laserRange));
+            KillPlayer();
         }
     }
 
