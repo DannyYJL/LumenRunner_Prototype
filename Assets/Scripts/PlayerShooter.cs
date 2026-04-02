@@ -65,26 +65,55 @@ public class PlayerShooter : MonoBehaviour
         }
     }
 
-    void Shoot()
-    {
-        bool useEnhancedShot = hasEnhancedShot;
-        hasEnhancedShot = false;
+void Shoot()
+{
+    bool useEnhancedShot = hasEnhancedShot;
+    hasEnhancedShot = false;
 
-        currentAmmo--;
-        UpdateAmmoUI();
-        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-        Vector3 targetPoint = Physics.Raycast(ray, out hit) ? hit.point : ray.GetPoint(100);
-        Vector3 direction = targetPoint - firePoint.position;
-        GameObject currentBullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
-        LightBullet lightBullet = currentBullet.GetComponent<LightBullet>();
-        if (lightBullet != null)
-        {
-            lightBullet.SetBlockBreaking(useEnhancedShot);
-            lightBullet.SetScoreOwner(playerMovement);
-        }
-        currentBullet.GetComponent<Rigidbody>().linearVelocity = direction.normalized * shootForce;
+    currentAmmo--;
+    UpdateAmmoUI();
+
+    Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+    RaycastHit hit;
+    Vector3 targetPoint = Physics.Raycast(ray, out hit) ? hit.point : ray.GetPoint(100);
+    Vector3 direction = targetPoint - firePoint.position;
+
+    GameObject currentBullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
+
+    // 让子弹忽略和玩家本体的碰撞
+    IgnorePlayerCollision(currentBullet);
+
+    LightBullet lightBullet = currentBullet.GetComponent<LightBullet>();
+    if (lightBullet != null)
+    {
+        lightBullet.SetBlockBreaking(useEnhancedShot);
+        lightBullet.SetScoreOwner(playerMovement);
     }
+
+    currentBullet.GetComponent<Rigidbody>().linearVelocity = direction.normalized * shootForce;
+}
+
+private void IgnorePlayerCollision(GameObject bullet)
+{
+    if (bullet == null) return;
+
+    Collider bulletCollider = bullet.GetComponent<Collider>();
+    if (bulletCollider == null)
+    {
+        bulletCollider = bullet.GetComponentInChildren<Collider>();
+    }
+
+    if (bulletCollider == null) return;
+
+    Collider[] playerColliders = GetComponentsInChildren<Collider>();
+    foreach (Collider playerCol in playerColliders)
+    {
+        if (playerCol != null)
+        {
+            Physics.IgnoreCollision(playerCol, bulletCollider);
+        }
+    }
+}
 
     IEnumerator Reload()
     {

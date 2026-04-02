@@ -3,10 +3,14 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Speed Settings")]
-    public float minSpeed = 5f;
-    public float maxSpeed = 30f;
-    public float acceleration = 15f;
+    public float baseSpeed = 5f;      // 原速
+    public float slowSpeed = 2f;      // 按 S 时的最低速度
+    public float maxSpeed = 30f;      // 按 W 时的最高速度
+    public float accelerateRate = 15f; // W/S 改变速度的速度
+    public float recoverRate = 10f;    // 松开后恢复原速的速度
+
     private float currentForwardSpeed;
+    private float targetForwardSpeed;
 
     [Header("Lateral Movement")]
     public float sideSpeed = 15f;
@@ -30,7 +34,9 @@ public class PlayerMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         Time.timeScale = 1f;
-        currentForwardSpeed = minSpeed;
+
+        currentForwardSpeed = baseSpeed;
+        targetForwardSpeed = baseSpeed;
         elapsedTime = 0f;
     }
 
@@ -40,16 +46,27 @@ public class PlayerMovement : MonoBehaviour
 
         elapsedTime += Time.deltaTime;
 
+        // 设置目标速度
         if (Input.GetKey(KeyCode.W))
         {
-            currentForwardSpeed += acceleration * Time.deltaTime;
+            targetForwardSpeed = maxSpeed;
         }
         else if (Input.GetKey(KeyCode.S))
         {
-            currentForwardSpeed -= acceleration * Time.deltaTime;
+            targetForwardSpeed = slowSpeed;
+        }
+        else
+        {
+            targetForwardSpeed = baseSpeed;
         }
 
-        currentForwardSpeed = Mathf.Clamp(currentForwardSpeed, minSpeed, maxSpeed);
+        // 平滑靠近目标速度
+        float rate = (targetForwardSpeed == baseSpeed) ? recoverRate : accelerateRate;
+        currentForwardSpeed = Mathf.MoveTowards(
+            currentForwardSpeed,
+            targetForwardSpeed,
+            rate * Time.deltaTime
+        );
     }
 
     void FixedUpdate()
@@ -58,7 +75,7 @@ public class PlayerMovement : MonoBehaviour
 
         float horizontalInput = Input.GetAxis("Horizontal");
 
-        Vector3 v = rb.linearVelocity;
+        Vector3 v = rb.linearVelocity;   // 如果你的 Unity 版本不支持 linearVelocity，改成 velocity
         v.z = currentForwardSpeed;
         v.x = horizontalInput * sideSpeed;
         rb.linearVelocity = v;
