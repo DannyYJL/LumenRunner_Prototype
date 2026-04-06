@@ -2461,9 +2461,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8fd0270b37f74d478046138d6ad1cc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  minSpeed: 5
+  baseSpeed: 5
+  slowSpeed: 2
   maxSpeed: 30
-  acceleration: 15
+  accelerateRate: 15
+  recoverRate: 10
   sideSpeed: 15
   roadWidth: 10
   jumpPadUpwardSpeed: 15
@@ -4410,7 +4412,7 @@ PrefabInstance:
     - target: {fileID: 5118308650914874745, guid: e25abc1acad3f984592b2b0c3ae75586, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: a6467a8b1597b2a41ad4e07bafab639f, type: 2}
+      objectReference: {fileID: 2100000, guid: 7a780ef94dd355144a2421cdd987aa8c, type: 2}
     - target: {fileID: 7739223801300881179, guid: e25abc1acad3f984592b2b0c3ae75586, type: 3}
       propertyPath: m_Name
       value: Collectible (1)
@@ -4480,7 +4482,7 @@ PrefabInstance:
     - target: {fileID: 5118308650914874745, guid: e25abc1acad3f984592b2b0c3ae75586, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: a6467a8b1597b2a41ad4e07bafab639f, type: 2}
+      objectReference: {fileID: 2100000, guid: 7a780ef94dd355144a2421cdd987aa8c, type: 2}
     - target: {fileID: 7739223801300881179, guid: e25abc1acad3f984592b2b0c3ae75586, type: 3}
       propertyPath: m_Name
       value: Collectible (2)
@@ -6888,6 +6890,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AnalyticsUploader
   endpoint: https://script.google.com/macros/s/AKfycbw9M_oug82hPArKXtQEsRy-_8_MtHyMKrYEYPW0fpbpMgmxpzgnRnqPGNPKd1t_VXqM/exec
   token: 888
+  mainMenuSceneName: MainMenu
 --- !u!4 &1653249773
 Transform:
   m_ObjectHideFlags: 0
@@ -7971,7 +7974,7 @@ PrefabInstance:
     - target: {fileID: 5118308650914874745, guid: e25abc1acad3f984592b2b0c3ae75586, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: a6467a8b1597b2a41ad4e07bafab639f, type: 2}
+      objectReference: {fileID: 2100000, guid: 7a780ef94dd355144a2421cdd987aa8c, type: 2}
     - target: {fileID: 7739223801300881179, guid: e25abc1acad3f984592b2b0c3ae75586, type: 3}
       propertyPath: m_Name
       value: Collectible
