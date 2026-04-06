@@ -45,6 +45,12 @@ public class GameManager : MonoBehaviour
         {
             gameHasEnded = true;
             canRestart = false;
+
+            AnalyticsUploader.Instance?.LogSurvivalTimePerAttempt(
+                playerMovement != null ? playerMovement.ElapsedTime : 0f,
+                "Death"
+            );
+
             Time.timeScale = 0f;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
@@ -88,6 +94,12 @@ public class GameManager : MonoBehaviour
         {
             gameHasEnded = true;
             canRestart = false;
+
+            AnalyticsUploader.Instance?.LogSurvivalTimePerAttempt(
+                playerMovement != null ? playerMovement.ElapsedTime : 0f,
+                "Finish"
+            );
+
             if (finishedUI != null)
             {
                 finishedUI.SetActive(true);
@@ -113,7 +125,7 @@ public class GameManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        AnalyticsUploader.Instance?.StartNewRun();
+        AnalyticsUploader.Instance?.StartNextAttemptInSameLevel();
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 

@@ -1046,7 +1046,7 @@ GameObject:
   - component: {fileID: 269567798}
   m_Layer: 0
   m_Name: Cube
-  m_TagString: Obstacles
+  m_TagString: Moving Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2159,9 +2159,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8fd0270b37f74d478046138d6ad1cc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  minSpeed: 5
+  baseSpeed: 5
+  slowSpeed: 2
   maxSpeed: 30
-  acceleration: 15
+  accelerateRate: 15
+  recoverRate: 10
   sideSpeed: 15
   roadWidth: 9
   jumpPadUpwardSpeed: 15

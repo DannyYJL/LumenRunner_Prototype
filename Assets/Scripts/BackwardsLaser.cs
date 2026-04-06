@@ -25,6 +25,8 @@ public class BackwardsLaser : MonoBehaviour
 
     private bool hasKilledPlayer = false;
 
+    private Transform lastHitPlayerTransform;
+
 
     void Start()
     {
@@ -54,6 +56,7 @@ public class BackwardsLaser : MonoBehaviour
             isLaserActive = true;
             activationStartTime = Time.time;
             lineRenderer.enabled = true;
+            lastHitPlayerTransform = null;
             yield return new WaitForSeconds(activeTime);
 
             isLaserActive = false;
@@ -76,6 +79,11 @@ public class BackwardsLaser : MonoBehaviour
         {
             fullEndPoint = hit.point;
             hitPlayer = hit.collider.CompareTag(playerTag);
+
+            if (hitPlayer)
+            {
+                lastHitPlayerTransform = hit.collider.transform;
+            }
         }
 
         float extendProgress = extendDuration <= 0f
@@ -99,6 +107,14 @@ public class BackwardsLaser : MonoBehaviour
         Debug.Log("Player hit by laser. Triggering Game Over!");
         
         FindObjectOfType<AnalyticsUploader>()?.LogDeath(DeathCause.Laser);
+        if (lastHitPlayerTransform != null)
+        {
+            PlayerMovement pm = lastHitPlayerTransform.GetComponent<PlayerMovement>();
+            if (pm != null)
+            {
+                AnalyticsUploader.Instance?.LogDeathDistanceAlongZ(pm.GetDistanceAlongZ());
+            }
+        }
 
         if (gameManager != null)
         {

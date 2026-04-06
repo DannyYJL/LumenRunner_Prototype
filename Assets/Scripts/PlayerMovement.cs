@@ -27,6 +27,8 @@ public class PlayerMovement : MonoBehaviour
     private bool isGameStopped = false;
     private float elapsedTime = 0f;
 
+    private float attemptStartZ;
+
     public int Score => score;
     public float ElapsedTime => elapsedTime;
 
@@ -38,6 +40,8 @@ public class PlayerMovement : MonoBehaviour
         currentForwardSpeed = baseSpeed;
         targetForwardSpeed = baseSpeed;
         elapsedTime = 0f;
+
+        attemptStartZ = transform.position.z;
     }
 
     void Update()
@@ -101,12 +105,20 @@ public class PlayerMovement : MonoBehaviour
         {
             StopMovement();
 
-            if (collision.gameObject.CompareTag("Moving Obstacle"))
+            if (collision.gameObject.CompareTag("Moving Obstacle")){
                 FindObjectOfType<AnalyticsUploader>()?.LogDeath(DeathCause.MovingObstacle);
-            if (collision.gameObject.CompareTag("Fall"))
+                AnalyticsUploader.Instance?.LogDeathDistanceAlongZ(GetDistanceAlongZ());
+            }
+                
+            if (collision.gameObject.CompareTag("Fall")){
                 FindObjectOfType<AnalyticsUploader>()?.LogDeath(DeathCause.Fissure);
-            if (collision.gameObject.CompareTag("Obstacles"))
+                AnalyticsUploader.Instance?.LogDeathDistanceAlongZ(GetDistanceAlongZ());
+            }
+                
+            if (collision.gameObject.CompareTag("Obstacles")){
                 FindObjectOfType<AnalyticsUploader>()?.LogDeath(DeathCause.Other);
+                AnalyticsUploader.Instance?.LogDeathDistanceAlongZ(GetDistanceAlongZ());
+            }
 
             if (gameManager != null)
             {
@@ -122,6 +134,8 @@ public class PlayerMovement : MonoBehaviour
         if (other.CompareTag("Finish"))
         {
             StopMovement();
+
+            AnalyticsUploader.Instance?.LogAttemptsBeforeCompletion();
 
             if (gameManager != null)
             {
@@ -154,5 +168,10 @@ public class PlayerMovement : MonoBehaviour
         isGameStopped = true;
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
+    }
+
+    public float GetDistanceAlongZ()
+    {
+        return transform.position.z - attemptStartZ;
     }
 }

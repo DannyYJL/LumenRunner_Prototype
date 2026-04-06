@@ -27,6 +27,16 @@ public class ChaserLogic : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
+            //记录死亡原因
+            AnalyticsUploader.Instance?.LogDeath(DeathCause.Chaser);
+
+
+            PlayerMovement pm = other.GetComponent<PlayerMovement>();
+            if (pm != null)
+            {
+                AnalyticsUploader.Instance?.LogDeathDistanceAlongZ(pm.GetDistanceAlongZ());
+            }
+
             // --- 关键修改点 ---
             // 寻找场景中的 GameManager 并调用 EndGame 方法
             GameManager gm = Object.FindObjectOfType<GameManager>();
