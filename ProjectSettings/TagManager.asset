@@ -9,6 +9,7 @@ TagManager:
   - Fall
   - Moving Obstacle
   - JumpPad
+  - Road
   layers:
   - Default
   - TransparentFX
