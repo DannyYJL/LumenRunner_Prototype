@@ -2167,6 +2167,7 @@ MonoBehaviour:
   sideSpeed: 15
   roadWidth: 9
   jumpPadUpwardSpeed: 15
+  jumpPadForwardSpeed: 7.7
   score: 0
   gameManager: {fileID: 1677936942}
 --- !u!54 &633982878
@@ -2286,7 +2287,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.008726558, z: 0, w: 0.999962}
   m_LocalPosition: {x: 0.88, y: 2.68, z: -70.39}
-  m_LocalScale: {x: 1.6572493, y: 1.970925, z: 2.394486}
+  m_LocalScale: {x: 1, y: 1.970925, z: 2.394486}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1735693509}
@@ -5108,6 +5109,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AnalyticsUploader
   endpoint: https://script.google.com/macros/s/AKfycbw9M_oug82hPArKXtQEsRy-_8_MtHyMKrYEYPW0fpbpMgmxpzgnRnqPGNPKd1t_VXqM/exec
   token: 888
+  mainMenuSceneName: MainMenu
 --- !u!4 &1653249773
 Transform:
   m_ObjectHideFlags: 0
