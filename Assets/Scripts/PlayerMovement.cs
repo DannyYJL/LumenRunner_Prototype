@@ -117,17 +117,32 @@ public class PlayerMovement : MonoBehaviour
             collision.gameObject.CompareTag("Obstacles"))
         {
             StopMovement();
+            DeathCause deathCause;
+            string collidedObjectName = collision.gameObject.name;
+            string collidedObjectTag = collision.gameObject.tag;
+            string collidedObjectPath = GetTransformPath(collision.transform);
+            string colliderName = collision.collider != null ? collision.collider.name : "UnknownCollider";
+            string colliderPath = collision.collider != null
+                ? GetTransformPath(collision.collider.transform)
+                : "UnknownColliderPath";
 
             if (collision.gameObject.CompareTag("Moving Obstacle"))
-                FindObjectOfType<AnalyticsUploader>()?.LogDeath(DeathCause.MovingObstacle);
+                deathCause = DeathCause.MovingObstacle;
             else if (collision.gameObject.CompareTag("Fall"))
-                FindObjectOfType<AnalyticsUploader>()?.LogDeath(DeathCause.Fissure);
+                deathCause = DeathCause.Fissure;
+            else if (collision.gameObject.CompareTag("Obstacles"))
+                deathCause = DeathCause.StaticObstacle;
             else
-                FindObjectOfType<AnalyticsUploader>()?.LogDeath(DeathCause.Other);
+                deathCause = DeathCause.Other;
+
+            Debug.LogWarning(
+                $"[Death] collidedWith={collidedObjectName} tag={collidedObjectTag} " +
+                $"objectPath={collidedObjectPath} collider={colliderName} colliderPath={colliderPath} cause={deathCause}");
+            FindObjectOfType<AnalyticsUploader>()?.LogDeath(deathCause);
 
             AnalyticsUploader.Instance?.LogDeathDistanceAlongZ(GetDistanceAlongZ());
 
-            if (gameManager != null) gameManager.EndGame();
+            if (gameManager != null) gameManager.EndGame(deathCause);
         }
     }
 
@@ -166,5 +181,24 @@ public class PlayerMovement : MonoBehaviour
     public float GetDistanceAlongZ()
     {
         return transform.position.z - attemptStartZ;
+    }
+
+    private string GetTransformPath(Transform target)
+    {
+        if (target == null)
+        {
+            return "Unknown";
+        }
+
+        string path = target.name;
+        Transform current = target.parent;
+
+        while (current != null)
+        {
+            path = current.name + "/" + path;
+            current = current.parent;
+        }
+
+        return path;
     }
 }

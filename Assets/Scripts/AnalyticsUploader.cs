@@ -8,6 +8,7 @@ public enum DeathCause
 {
     Fissure,
     MovingObstacle,
+    StaticObstacle,
     Laser,
     Chaser,
     Other
@@ -28,6 +29,9 @@ public class AnalyticsUploader : MonoBehaviour
 
     private int attemptsInCurrentLevel = 1;
     private string currentLevelName = "";
+    private DeathCause? lastDeathCause = null;
+
+    public DeathCause? LastDeathCause => lastDeathCause;
 
     [Header("Menu Scene Name")]
     public string mainMenuSceneName = "MainMenu";
@@ -92,6 +96,7 @@ public class AnalyticsUploader : MonoBehaviour
         currentLevelName = levelName;
         attemptsInCurrentLevel = 1;
         runId++;
+        lastDeathCause = null;
 
         Debug.Log($"[Analytics] StartLevelSession level={currentLevelName}, attempts=1, runId={runId}");
     }
@@ -100,6 +105,7 @@ public class AnalyticsUploader : MonoBehaviour
     {
         attemptsInCurrentLevel++;
         runId++;
+        lastDeathCause = null;
 
         Debug.Log($"[Analytics] StartNextAttemptInSameLevel level={currentLevelName}, attempts={attemptsInCurrentLevel}, runId={runId}");
     }
@@ -107,6 +113,12 @@ public class AnalyticsUploader : MonoBehaviour
     public void LogDeath(DeathCause cause)
     {
         string timestamp = DateTime.UtcNow.ToString("o");
+        string levelNameForLog = string.IsNullOrEmpty(currentLevelName)
+            ? SceneManager.GetActiveScene().name
+            : currentLevelName;
+        lastDeathCause = cause;
+
+        Debug.LogWarning($"[Death] level={levelNameForLog} cause={cause}");
         StartCoroutine(PostDeath(runId, timestamp, cause.ToString()));
     }
 
@@ -128,8 +140,8 @@ public class AnalyticsUploader : MonoBehaviour
         using var req = UnityWebRequest.Post(endpoint, form);
         yield return req.SendWebRequest();
 
-        Debug.Log($"[Analytics][Death] code={req.responseCode} result={req.result} err={req.error}");
-        Debug.Log($"[Analytics][Death] resp={req.downloadHandler.text}");
+        Debug.Log($"[Analytics][Death] reason={reason} code={req.responseCode} result={req.result} err={req.error}");
+        Debug.Log($"[Analytics][Death] reason={reason} resp={req.downloadHandler.text}");
     }
 
     IEnumerator PostAttemptsBeforeCompletion(string timestamp, string levelName, int attempts)
@@ -186,6 +198,8 @@ public class AnalyticsUploader : MonoBehaviour
     public void LogDeathDistanceAlongZ(float distanceAlongZ)
     {
         string timestamp = DateTime.UtcNow.ToString("o");
+        string causeText = lastDeathCause?.ToString() ?? DeathCause.Other.ToString();
+        Debug.LogWarning($"[Death] cause={causeText} distanceAlongZ={distanceAlongZ:F3}");
         StartCoroutine(PostDeathDistanceAlongZ(timestamp, currentLevelName, distanceAlongZ));
     }
 
@@ -201,7 +215,8 @@ public class AnalyticsUploader : MonoBehaviour
         using var req = UnityWebRequest.Post(endpoint, form);
         yield return req.SendWebRequest();
 
-        Debug.Log($"[Analytics][DeathLocation] code={req.responseCode} result={req.result} err={req.error}");
-        Debug.Log($"[Analytics][DeathLocation] resp={req.downloadHandler.text}");
+        string causeText = lastDeathCause?.ToString() ?? DeathCause.Other.ToString();
+        Debug.Log($"[Analytics][DeathLocation] cause={causeText} code={req.responseCode} result={req.result} err={req.error}");
+        Debug.Log($"[Analytics][DeathLocation] cause={causeText} resp={req.downloadHandler.text}");
     }
 }

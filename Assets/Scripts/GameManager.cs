@@ -39,12 +39,16 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void EndGame()
+    public void EndGame(DeathCause? cause = null)
     {
         if (!gameHasEnded)
         {
             gameHasEnded = true;
             canRestart = false;
+
+            DeathCause? finalCause = cause ?? AnalyticsUploader.Instance?.LastDeathCause;
+            string finalCauseText = finalCause?.ToString() ?? "Unknown";
+            Debug.LogWarning($"[Death] finalized cause={finalCauseText}");
 
             AnalyticsUploader.Instance?.LogSurvivalTimePerAttempt(
                 playerMovement != null ? playerMovement.ElapsedTime : 0f,

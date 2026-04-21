@@ -42,7 +42,7 @@ public class ChaserLogic : MonoBehaviour
             GameManager gm = Object.FindObjectOfType<GameManager>();
             if (gm != null)
             {
-                gm.EndGame();
+                gm.EndGame(DeathCause.Chaser);
             }
             else
             {

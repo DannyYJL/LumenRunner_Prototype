@@ -118,7 +118,7 @@ public class BackwardsLaser : MonoBehaviour
 
         if (gameManager != null)
         {
-            gameManager.EndGame();
+            gameManager.EndGame(DeathCause.Laser);
         }
         else
         {

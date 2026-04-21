@@ -1378,7 +1378,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.8, z: 0.2}
+  m_LocalPosition: {x: 0, y: 1.2, z: 0.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2469,6 +2469,7 @@ MonoBehaviour:
   sideSpeed: 15
   roadWidth: 10
   jumpPadUpwardSpeed: 15
+  jumpPadForwardSpeed: 7.7
   score: 0
   gameManager: {fileID: 1677936942}
 --- !u!54 &633982878
@@ -2588,7 +2589,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.008726558, z: 0, w: 0.999962}
   m_LocalPosition: {x: 0.88, y: 2.68, z: -73.08}
-  m_LocalScale: {x: 1.6572493, y: 1.970925, z: 2.394486}
+  m_LocalScale: {x: 1, y: 1.970925, z: 2.394486}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1735693509}
@@ -6981,7 +6982,7 @@ Transform:
   m_GameObject: {fileID: 1735693508}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.01, y: 0, z: 0.79}
+  m_LocalPosition: {x: -0, y: 0, z: 0.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
