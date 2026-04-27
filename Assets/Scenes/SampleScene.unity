@@ -4850,7 +4850,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MovingPlatform
   amplitude: 5
-  speed: 1.25
+  speed: 1.8
   moveAxis: {x: 1, y: 0, z: 0}
 --- !u!54 &1469877802
 Rigidbody:
